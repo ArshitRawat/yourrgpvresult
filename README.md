@@ -35,7 +35,7 @@ project/
 
 > ✅ Make sure the CSV contains header + student rows exactly like this:
 
-```csv
+csv
 ROLL.NO,NAME,BT101,BT102,...,SGPA,CGPA,RESULT
 0105CS211001,AAKASH PATEL,B+,B,...,8.19,8.19,PASS
 ...
