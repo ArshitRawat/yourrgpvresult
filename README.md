@@ -136,4 +136,4 @@ Automated data collection for reports
 This project is provided for academic, research, and educational use only. Unauthorized scraping of live data may violate website terms.
 
 ✨ Created By
-<p align="center"> <b>Arshit Rawat</b> <br/> 💻 <a href="https://github.com/arshitrawat" target="_blank">github.com/arshitrawat</a> <br/> 📧 arshitrawat2704@gmail.com </p>
+<p align="center"> <b>Arshit Rawat UNDER Department of Computer Science & Engineering O.I.S.T, BHOPAL</b> <br/> 💻 <a href="https://github.com/arshitrawat" target="_blank">github.com/arshitrawat</a> <br/> 📧 arshitrawat2704@gmail.com </p>
