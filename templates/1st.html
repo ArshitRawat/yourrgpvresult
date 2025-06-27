@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your RGPV Result</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #d3cce3, #e9e4f0);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      margin-top: 50px;
+      margin-bottom: 40px;
+      padding: 10px 24px 10px;
+      border-radius: 16px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      max-width: 440px;
+      width: 100%;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #1abc9c 0%, #16a085 50%, #0d7377 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-family: 'Poppins', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 2px 4px rgba(26, 188, 156, 0.3);
+      position: relative;
+    }
+
+    h2::before {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100%);
+      height: 3px;
+      background: linear-gradient(135deg, #1abc9c, #16a085);
+      border-radius: 2px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      background: #f9f9f9;
+      box-sizing: border-box;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='14' height='10' viewBox='0 0 14 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23888' d='M1 1l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 14px;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #1abc9c;
+      box-shadow: 0 0 0 3px rgba(26, 188, 156, 0.2);
+      background-color: #fff;
+    }
+
+    .input-group {
+      margin-top: 8px;
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .flex-row .input-group {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    /* Checkbox styling */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 20px;
+      padding: 12px 16px;
+      background: #f0f8ff;
+      border: 1px solid #b3d9ff;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .checkbox-group:hover {
+      background: #e6f3ff;
+      border-color: #80c0ff;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      cursor: pointer;
+      accent-color: #1abc9c;
+      pointer-events: none; /* Prevent double-clicking the checkbox */
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #2c5aa0;
+      pointer-events: none; /* Make label clicks go through to container */
+    }
+
+    /* Hide start/end fields when old result is checked */
+    .hidden {
+      display: none !important;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      font-size: 15px;
+      background: #1abc9c;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #16a085;
+    }
+
+    button:disabled {
+      background: #b2dfdb;
+      cursor: not-allowed;
+    }
+
+    #progressContainer {
+      margin-top: 30px;
+      display: none;
+      text-align: center;
+    }
+
+    #progressBar {
+      width: 100%;
+      height: 18px;
+      border-radius: 10px;
+    }
+
+    #progressBar::-webkit-progress-bar {
+      background-color: #eee;
+      border-radius: 10px;
+    }
+
+    #progressBar::-webkit-progress-value {
+      background-color: #1abc9c;
+      border-radius: 10px;
+    }
+
+    #progressText {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 14px;
+      color: #333;
+      display: block;
+    }
+
+    #enrollText {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .corner-text {
+      text-align: center;
+      font-size: 12px;
+      color: #5c5c5c;
+      margin-bottom: 12px;
+    }
+
+    .corner-text:hover {
+      color: #2c2c2c;
+    }
+
+    .disclaimer-text {
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      margin-top: 20px;
+      line-height: 1.4;
+    }
+
+    .download-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .download-buttons button {
+      flex: 1;
+      margin-top: 0;
+    }
+
+    #downloadPdf {
+      background-color: #ff6b6b;
+    }
+
+    #downloadPdf:hover {
+      background-color: #e55b5b;
+    }
+
+    #downloadPdf:disabled {
+      background-color: #f3bebe;
+    }
+
+    .info-text {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+      line-height: 1.3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>YOUR RGPV RESULT</h2>
+    <form id="resultForm">
+      <div class="input-group">
+        <label for="college">College Code</label>
+        <input type="text" name="college" placeholder="e.g., 0105" required>
+      </div>
+
+      <div class="flex-row">
+        <div class="input-group">
+          <label for="branch">Branch</label>
+          <select name="branch" required>
+            <option value="">Branch</option>
+            <option value="CS">CSE</option>
+            <option value="IT">IT</option>
+            <option value="ME">ME</option>
+            <option value="al">CS-AIML</option>
+            <option value="cd">CS-DS</option>
+            <option value="EC">EC</option>
+            <option value="EX">EX</option>
+            <option value="au">AU</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="year">Batch</label>
+          <select name="year" required>
+            <option value="">Batch</option>
+            <option value="21">2021-25</option>
+            <option value="22">2022-26</option>
+            <option value="23">2023-27</option>
+            <option value="24">2024-28</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="sem">Semester</label>
+          <select name="sem" required>
+            <option value="">Sem</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Old Result Checkbox - FIXED -->
+      <div class="checkbox-group" onclick="toggleCheckbox()">
+        <input type="checkbox" name="old_result" id="oldResultCheckbox">
+        <label for="oldResultCheckbox">Select if downloading results from previous semesters.</label>
+      </div>
+      <div class="info-text" style="font-size: 0.665em;">
+        <!--💾 Select if downloading old results.-->
+	*At this moment, previous results are available exclusively for the CSE branch of OIST, Bhopal.
+      </div>
+
+      <!-- Start/End Roll fields (hidden when old result is checked) -->
+      <div id="rollFields">
+        <div class="input-group">
+          <label for="start">Starting Roll</label>
+          <input type="number" name="start" placeholder="e.g. 1, 101" required>
+        </div>
+
+        <div class="input-group">
+          <label for="end">Ending Roll</label>
+          <input type="number" name="end" placeholder="e.g. 5, 105" required>
+        </div>
+      </div>
+
+      <button type="submit" id="fetchBtn">Fetch Results</button>
+    </form>
+
+    <div id="progressContainer">
+      <progress id="progressBar" value="0" max="100"></progress>
+      <span id="progressText">0%</span>
+      <div id="enrollText">Processing...</div>
+      <div class="download-buttons">
+        <button id="downloadXlsx" disabled style="display: none;">Download XLSX</button>
+        <button id="downloadPdf" disabled style="display: none;">Download PDF</button>
+      </div>
+    </div>
+
+    <p class="disclaimer-text">
+      <strong>Disclaimer:</strong> This tool is for educational use only.<br>
+      It does not misuse any data and is not affiliated with RGPV.
+    </p>
+
+    <p class="corner-text">Developed and Maintained by: <strong>Department of Computer Science & Engineering, O.I.S.T, Bhopal</strong></p>
+  </div>
+
+  <script>
+    const form = document.getElementById("resultForm");
+    const fetchBtn = document.getElementById("fetchBtn");
+    const progressContainer = document.getElementById("progressContainer");
+    const progressBar = document.getElementById("progressBar");
+    const progressText = document.getElementById("progressText");
+    const enrollText = document.getElementById("enrollText");
+    const btnXlsx = document.getElementById("downloadXlsx");
+    const btnPdf = document.getElementById("downloadPdf");
+    const oldResultCheckbox = document.getElementById("oldResultCheckbox");
+    const rollFields = document.getElementById("rollFields");
+
+    // Toggle checkbox when clicking the div - FIXED FUNCTION
+    function toggleCheckbox() {
+      oldResultCheckbox.checked = !oldResultCheckbox.checked;
+      toggleOldResult();
+    }
+
+    // Toggle old result functionality
+    function toggleOldResult() {
+      const isChecked = oldResultCheckbox.checked;
+      
+      if (isChecked) {
+        fetchBtn.textContent = "Fetch Old Results";
+      } else {
+        fetchBtn.textContent = "Fetch Results";
+      }
+    }
+
+    // Handle checkbox click
+    oldResultCheckbox.addEventListener('change', toggleOldResult);
+
+    form.onsubmit = async function (e) {
+      e.preventDefault();
+      fetchBtn.disabled = true;
+      
+      const isOldResult = oldResultCheckbox.checked;
+      fetchBtn.textContent = isOldResult ? "Searching..." : "Submitting...";
+      
+      progressContainer.style.display = "block";
+      btnXlsx.style.display = "none";
+      btnPdf.style.display = "none";
+
+      const formData = new FormData(form);
+
+      try {
+        const res = await fetch("/submit", { method: "POST", body: formData });
+        const result = await res.json();
+
+        if (result.error) {
+          alert(result.error);
+          fetchBtn.textContent = isOldResult ? "Fetch Old Results" : "Fetch Results";
+          fetchBtn.disabled = false;
+          progressContainer.style.display = "none";
+          return;
+        }
+
+        const { job_id } = result;
+
+        // For old results, we might get immediate response
+        if (result.immediate_download) {
+          progressBar.value = 100;
+          progressText.textContent = "100%";
+          enrollText.textContent = "File found! Preparing download...";
+          
+          setTimeout(() => {
+            btnXlsx.dataset.jobId = job_id;
+            btnXlsx.style.display = "inline-block";
+            btnXlsx.disabled = false;
+            btnXlsx.onclick = () => window.location.href = `/download/${job_id}`;
+            
+            btnPdf.dataset.jobId = job_id;
+            btnPdf.style.display = "inline-block";
+            btnPdf.disabled = false;
+            btnPdf.onclick = () => window.location.href = `/download/${job_id}?type=pdf`;
+            
+            enrollText.textContent = "Download ready.";
+            fetchBtn.textContent = isOldResult ? "Fetch Old Results" : "Fetch Results";
+            fetchBtn.disabled = true;
+          }, 1000);
+          return;
+        }
+
+        // Regular polling for new results
+        const poll = setInterval(async () => {
+          const progressRes = await fetch(`/progress/${job_id}`);
+          const data = await progressRes.json();
+
+          const percent = Math.floor((data.done / data.total) * 100);
+          progressBar.value = percent;
+          progressText.textContent = `${data.done}/${data.total} (${percent}%)`;
+          enrollText.textContent = data.current_enroll || "Waiting...";
+
+          if (data.done >= data.total) {
+            clearInterval(poll);
+            enrollText.textContent = "Finished. Verifying files...";
+            setTimeout(async () => {
+              const x = await fetch(`/download/${job_id}`, { method: "HEAD" });
+              const p = await fetch(`/download/${job_id}?type=pdf`, { method: "HEAD" });
+
+              if (x.ok) {
+                btnXlsx.dataset.jobId = job_id;
+                btnXlsx.style.display = "inline-block";
+                btnXlsx.disabled = false;
+                btnXlsx.onclick = () => window.location.href = `/download/${job_id}`;
+              }
+
+              if (p.ok) {
+                btnPdf.dataset.jobId = job_id;
+                btnPdf.style.display = "inline-block";
+                btnPdf.disabled = false;
+                btnPdf.onclick = () => window.location.href = `/download/${job_id}?type=pdf`;
+              }
+
+              enrollText.textContent = "Download ready.";
+              fetchBtn.textContent = isOldResult ? "Fetch Old Results" : "Fetch Results";
+              fetchBtn.disabled = false;
+            }, 2000);
+          }
+        }, 3000);
+      } catch (err) {
+        console.error("Error:", err);
+        fetchBtn.textContent = "Try Again";
+        fetchBtn.disabled = false;
+        progressContainer.style.display = "none";
+      }
+    };
+  </script>
+</body>
+</html>

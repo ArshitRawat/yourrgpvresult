@@ -1,0 +1,10 @@
+requests
+pandas
+flask
+selenium
+pillow
+pytesseract
+retportlab
+matplotlib
+openpyxl
+bs4
