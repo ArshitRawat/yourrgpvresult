@@ -310,6 +310,12 @@
         </div>
       </div>
 
+<!-- Diploma Students Checkbox -->
+      <div class="checkbox-group" onclick="toggleDiplomaCheckbox()">
+        <input type="checkbox" name="diploma" id="diplomaCheckbox">
+        <label for="diplomaCheckbox">Check if you are a diploma student.</label>
+      </div>
+
       <!-- Old Result Checkbox - FIXED -->
       <div class="checkbox-group" onclick="toggleCheckbox()">
         <input type="checkbox" name="old_result" id="oldResultCheckbox">
@@ -319,6 +325,7 @@
         <!--💾 Select if downloading old results.-->
 	*At this moment, previous results are available exclusively for the CSE branch of OIST, Bhopal.
       </div>
+
 
       <!-- Start/End Roll fields (hidden when old result is checked) -->
       <div id="rollFields">
@@ -351,6 +358,10 @@
       It does not misuse any data and is not affiliated with RGPV.
     </p>
 
+    <div style="text-align: center; margin-top: 20px;">
+      <a href="/sgpa" style="color: #1abc9c; text-decoration: none; font-weight: 600; font-size: 14px; border: 1px solid #1abc9c; padding: 8px 16px; border-radius: 8px; display: inline-block; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#1abc9c'; this.style.color='white'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#1abc9c'">🔍 Search SGPA by Enrollment Number</a>
+    </div>
+
     <p class="corner-text">Developed and Maintained by: <strong>Department of Computer Science & Engineering, O.I.S.T, Bhopal</strong></p>
   </div>
 
@@ -372,7 +383,7 @@
       toggleOldResult();
     }
 
-    // Toggle old result functionality
+// Toggle old result functionality
     function toggleOldResult() {
       const isChecked = oldResultCheckbox.checked;
       
@@ -381,6 +392,12 @@
       } else {
         fetchBtn.textContent = "Fetch Results";
       }
+    }
+
+    // Toggle diploma student checkbox
+    function toggleDiplomaCheckbox() {
+      const diplomaCheckbox = document.getElementById("diplomaCheckbox");
+      diplomaCheckbox.checked = !diplomaCheckbox.checked;
     }
 
     // Handle checkbox click
