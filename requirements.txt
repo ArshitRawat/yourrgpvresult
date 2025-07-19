@@ -1,10 +1,9 @@
-requests
-pandas
 flask
 selenium
-pillow
-pytesseract
-retportlab
+pandas
 matplotlib
+reportlab
 openpyxl
-bs4
+requests
+pytesseract
+pillow
