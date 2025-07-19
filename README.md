@@ -1,139 +1,245 @@
-# 🎓 RGPV Result Scraper & Analyzer
+# RGPV Result WebScraper
 
-A full-stack Python web application that automates the extraction, filtering, and analysis of student results from the official [RGPV](http://result.rgpv.ac.in/) portal. It supports both **live scraping** and **local CSV fetching**. The app generates Excel and PDF reports with SGPA/CGPA statistics and pie charts.
+A comprehensive web application for fetching and analyzing RGPV (Rajiv Gandhi Proudyogiki Vishwavidyalaya) student results with support for both regular and diploma students.
 
-> ⚠️ Intended for academic and educational purposes only.
+## 🌟 Features
+
+### Core Functionality
+- **Batch Result Fetching**: Download results for multiple students in one go
+- **Individual SGPA Search**: Search SGPA data across all semesters for a specific enrollment number
+- **Diploma Student Support**: Special handling for diploma students with different enrollment formats
+- **Old Result Access**: Access previously stored results from local files
+- **Multi-format Export**: Export results in both Excel (.xlsx) and PDF formats
+
+### Data Analysis & Visualization
+- **Automated Grade Analysis**: Calculates pass/fail counts for each subject
+- **SGPA/CGPA Distribution**: Visual pie charts showing grade distributions
+- **Statistical Reports**: Comprehensive analysis with student performance metrics
+- **Excel Integration**: Embedded charts and formatted spreadsheets
+
+### User Interface
+- **Responsive Design**: Modern, mobile-friendly interface
+- **Real-time Progress**: Live progress tracking during result fetching
+- **Interactive Forms**: Dynamic form fields based on user selections
+- **Error Handling**: Comprehensive error messages and validation
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python 3.7+
+- Chrome browser (for Selenium WebDriver)
+- Tesseract OCR
+
+### Required Dependencies
+
+```bash
+pip install flask selenium pandas matplotlib reportlab openpyxl requests pytesseract pillow
+```
+
+### System Requirements
+
+1. **Tesseract OCR**: Download and install from [GitHub](https://github.com/tesseract-ocr/tesseract)
+   - Update the path in `newscrapper.py` (line 38):
+   ```python
+   pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
+   ```
+
+2. **ChromeDriver**: Ensure Chrome browser is installed (ChromeDriver will be automatically managed)
+
+### Installation
+
+1. Clone or download the project
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Update Tesseract path in `newscrapper.py`
+4. Run the application:
+   ```bash
+   python newscrapper.py
+   ```
+5. Open your browser and navigate to `http://localhost`
+
+## 📚 Usage Guide
+
+### Main Result Fetching
+
+1. **Basic Information**:
+   - Enter College Code (e.g., `0105`)
+   - Select Branch (CSE, IT, ME, etc.)
+   - Choose Batch (2021-25, 2022-26, etc.)
+   - Select Semester (1-8)
+
+2. **Student Type Selection**:
+   - **Regular Students**: Standard enrollment format
+   - **Diploma Students**: Check the diploma checkbox and select admission semester (3 or 5)
+
+3. **Result Source**:
+   - **New Results**: Fetch fresh data from RGPV servers
+   - **Old Results**: Access previously stored local files
+
+4. **Roll Number Range**:
+   - Enter starting and ending roll numbers
+   - Example: Start: 1, End: 50
+
+### SGPA Search
+
+1. Navigate to SGPA Search page
+2. Enter 12-digit enrollment number
+3. Check diploma student if applicable
+4. System will search across all available semesters
+
+### Understanding Enrollment Formats
+
+- **Regular Students**: `0133CS231047`
+  - Format: `[College][Branch][Year]1[Roll]`
+- **Diploma Students**: `0133CS243D21`
+  - Format: `[College][Branch][Year][AdmissionSem]D[Roll]`
+
+## 🏗️ Project Structure
+
+```
+WebScraper/
+├── newscrapper.py          # Main Flask application and core logic
+├── templates/
+│   ├── 1st.html           # Main result fetching interface
+│   └── sgpa.html          # SGPA search interface
+├── [College][Branch]/      # Directory structure for stored results
+│   └── *.csv              # Semester-wise result files
+├── *.xlsx                 # Generated Excel files
+├── *.pdf                  # Generated PDF files
+├── *_pie_*.png           # Generated chart images
+└── README.md             # This file
+```
+
+## 🔧 Key Functions
+
+### Core Processing Functions
+
+- **`resultFound()`**: Main function for fetching new results from RGPV servers
+- **`handle_old_result()`**: Processes locally stored result files
+- **`fetch_sgpa_by_enrollment()`**: Retrieves SGPA data for individual students
+- **`generate_enrollment_numbers()`**: Creates enrollment numbers for both regular and diploma students
+
+### Data Processing Functions
+
+- **`makeXslx()`**: Converts CSV data to Excel format with embedded charts
+- **`makePdfFromExcel()`**: Generates PDF reports from Excel files
+- **`calculate_grades_and_averages()`**: Analyzes grade distributions
+- **`fail_counter()`**: Calculates pass/fail statistics
+
+### Utility Functions
+
+- **`readFromImage()`**: OCR-based captcha solving
+- **`writeCSV()`**: Structured CSV data writing
+- **`safe_delete()`**: Secure file cleanup
+
+## 📊 Output Formats
+
+### Excel Files (.xlsx)
+- Formatted spreadsheets with student data
+- Embedded SGPA and CGPA distribution charts
+- Pass/fail statistics for each subject
+- 1-based row indexing for user convenience
+
+### PDF Files (.pdf)
+- Professional report layout
+- Tabular data presentation
+- Integrated statistical charts
+- Landscape orientation for better readability
+
+### CSV Files (.csv)
+- Raw data in comma-separated format
+- Includes grade analysis and statistics
+- Compatible with external data analysis tools
+
+## 🎯 Special Features
+
+### Diploma Student Support
+- Automatic enrollment format adjustment
+- Year calculation correction (year - 1 for SGPA search)
+- Admission semester handling (3rd and 5th semester options)
+
+### Progress Tracking
+- Real-time progress updates during batch processing
+- Current enrollment number display
+- Percentage completion indicators
+
+### File Management
+- Automatic file cleanup after 2 minutes
+- Secure temporary file handling
+- Organized directory structure
+
+## ⚙️ Configuration
+
+### Branch Codes
+- `CS`: Computer Science Engineering
+- `IT`: Information Technology
+- `ME`: Mechanical Engineering
+- `al`: CS-AIML (Artificial Intelligence & Machine Learning)
+- `cd`: CS-DS (Computer Science & Data Science)
+- `EC`: Electronics & Communication
+- `EX`: Electronics Engineering
+- `au`: Automobile Engineering
+
+### Batch Years
+- `21`: 2021-25
+- `22`: 2022-26
+- `23`: 2023-27
+- `24`: 2024-28
+
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+1. **Tesseract Path Error**:
+   - Verify Tesseract installation
+   - Update path in `newscrapper.py`
+
+2. **ChromeDriver Issues**:
+   - Ensure Chrome browser is updated
+   - Check internet connectivity
+
+3. **File Not Found Errors**:
+   - Verify directory structure
+   - Check file permissions
+
+4. **Captcha Recognition Failures**:
+   - Network connectivity issues
+   - OCR accuracy limitations (system will retry)
+
+## 📝 API Endpoints
+
+- `GET /`: Main result fetching interface
+- `GET /sgpa`: SGPA search interface
+- `POST /submit`: Process result fetching requests
+- `POST /submit-sgpa`: Process SGPA search requests
+- `GET /progress/<job_id>`: Get processing progress
+- `GET /download/<job_id>`: Download generated files
+
+## 🚨 Disclaimer
+
+This tool is developed for educational purposes only. It does not misuse any data and is not officially affiliated with RGPV (Rajiv Gandhi Proudyogiki Vishwavidyalaya).
+
+## 👥 Developed By:
+
+**Developed and Maintained by:**
+Arshit Rawat, Department of Computer Science & Engineering, O.I.S.T, Bhopal
+
+## 📄 License
+
+This project is intended for educational use and internal purposes within the academic institution.
+
+## 🔄 Version History
+
+- **Latest Version**: Enhanced diploma student support with dynamic form fields
+- **Previous Updates**: 
+  - Added SGPA search functionality
+  - Implemented real-time progress tracking
+  - Enhanced data visualization with charts
+  - Improved error handling and user experience
 
 ---
 
-## 📌 Key Features
-
-- 🔍 **Automated Result Scraping** using Selenium.
-- 🔐 **Captcha Solving** with Tesseract OCR.
-- 📊 **SGPA/CGPA Analytics** and Pie Charts.
-- 📁 **CSV, Excel, and PDF Export**.
-- 🧾 **Old Result Fetching** from local CSV files.
-- 🖥️ **Real-time Progress Tracker** via Flask web interface.
-
----
-
-## 📁 Folder & File Requirements
-
-### 🔹 For Local CSV-Based Fetching:
-
-You must organize CSV files in the following structure:
-
-project/
-├── 0105CS/
-│ └── 0105CS21sem1.csv
-├── 0413IT/
-│ └── 0413IT20sem3.csv
-
-- Folder name = `{college}{branch}` (e.g., `0105CS`)
-- File name = `{college}{branch}{year}sem{sem}.csv`  
-  (e.g., `0105CS21sem1.csv`)
-
-> ✅ Make sure the CSV contains header + student rows exactly like this:
-
-```
-ROLL.NO,NAME,BT101,BT102,...,SGPA,CGPA,RESULT
-0105CS211001,AAKASH PATEL,B+,B,...,8.19,8.19,PASS
-...
-```
-⚙️ Installation & Setup
-1. Clone the Repository
-
-git clone https://github.com/yourusername/rgpv-result-scraper.git
-cd rgpv-result-scraper
-
-2. Install Required Packages
-
-pip install -r requirements.txt
-
-3. Install Tesseract OCR
-
-Download Tesseract
-
-After installation, update the following line in newscrapper.py:
-
-
-pytesseract.pytesseract.tesseract_cmd = r"C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
-🚗 ChromeDriver Setup (for Selenium)
-
-🔹 Step 1: Check Chrome Version
-
-Go to chrome://settings/help in your browser to find your Chrome version.
-
-🔹 Step 2: Download Matching ChromeDriver
-
-Visit: https://chromedriver.chromium.org/downloads
-
-Download the version matching your browser.
-
-Extract it into a folder named driver/ in your project.
-
-
-rgpv-result-scraper/
-├── driver/
-│   └── chromedriver.exe (Windows) or chromedriver (Linux/Mac)
-
-🔹 Step 3: (Optional) Hardcode ChromeDriver Path
-
-In newscrapper.py, change:
-driver = webdriver.Chrome(options=chrome_options)
-to:
-chrome_path = os.path.join(base_dir, 'driver', 'chromedriver.exe')  # Adjust if Linux/Mac
-driver = webdriver.Chrome(executable_path=chrome_path, options=chrome_options)
-
-▶️ Running the Application
-
-python newscrapper.py
-
-Then open your browser and go to:
-
-http://localhost
-
-**INPUT EXAMPLE**
-![image](https://github.com/user-attachments/assets/bc28a50e-d091-45da-9319-c4db3339d964)
-
-📤 Output Examples
-**OUTPUT PAGE**
-![image](https://github.com/user-attachments/assets/0f4440f2-813b-4f90-bed2-429eadbcaea7)
-
-**EXCEL PAGE**
-![image](https://github.com/user-attachments/assets/7e2cd103-60fb-42c6-bbdc-3277ad4cf69f)
-
-.– With embedded charts
-
-**PDF  PAGE**
-![image](https://github.com/user-attachments/assets/1d156aec-ccd3-4530-b5ad-8730fb2427bc)
-![image](https://github.com/user-attachments/assets/3bf57a03-8735-4b80-81d1-bca047a0e365)
-
-
-.pdf – Tabular layout with pie charts
-
-Output files are temporarily stored and auto-deleted after a few minutes.
-
-📈 Visual Example
-(Optional screenshots section – add your own)
-
-📋 Web Form UI
-
-📊 SGPA/CGPA Pie Charts
-
-📁 Excel File with Charts
-
-📄 Downloadable PDF Report
-
-💡 Use Cases
-Department result audits
-
-Batch-wise academic performance
-
-Automated data collection for reports
-
-📄 License
-This project is provided for academic, research, and educational use only. Unauthorized scraping of live data may violate website terms.
-
-✨ Created By
-<p align="center"> <b>Arshit Rawat UNDER Department of Computer Science & Engineering O.I.S.T, BHOPAL</b> <br/> 💻 <a href="https://github.com/arshitrawat" target="_blank">github.com/arshitrawat</a> <br/> 📧 arshitrawat2704@gmail.com </p>
+**Note**: Ensure you have proper permissions and follow your institution's guidelines when using this tool for accessing student result data.
