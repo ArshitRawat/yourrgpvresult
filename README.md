@@ -31,7 +31,8 @@ A comprehensive web application for fetching and analyzing RGPV (Rajiv Gandhi Pr
 
 
 ### SGPA Search Interface
-<img width="1366" height="638" alt="image" src="https://github.com/user-attachments/assets/f77a7af6-0f54-4579-a876-6311c5d5b29e" />
+<img width="1366" height="638" alt="image" src="https://github.com/user-attachments/assets/c9433d61-ecc2-41f2-be7e-51e4b9bd6ddd" />
+
 
 
 ### Results Dashboard
