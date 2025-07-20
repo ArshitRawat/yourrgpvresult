@@ -56,7 +56,7 @@ pip install flask selenium pandas matplotlib reportlab openpyxl requests pytesse
 ### System Requirements
 
 1. **Tesseract OCR**: Download and install from [GitHub](https://github.com/tesseract-ocr/tesseract)
-   - Update the path in `newscrapper.py` (line 38):
+   - Update the path in `app.py` (line 38):
    ```python
    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
    ```
@@ -70,10 +70,10 @@ pip install flask selenium pandas matplotlib reportlab openpyxl requests pytesse
    ```bash
    pip install -r requirements.txt
    ```
-3. Update Tesseract path in `newscrapper.py`
+3. Update Tesseract path in `app.py`
 4. Run the application:
    ```bash
-   python newscrapper.py
+   python app.py
    ```
 5. Open your browser and navigate to `http://localhost`
 
@@ -117,7 +117,7 @@ pip install flask selenium pandas matplotlib reportlab openpyxl requests pytesse
 
 ```
 WebScraper/
-├── newscrapper.py          # Main Flask application and core logic
+├── app.py          # Main Flask application and core logic
 ├── templates/
 │   ├── 1st.html           # Main result fetching interface
 │   └── sgpa.html          # SGPA search interface
@@ -211,7 +211,7 @@ WebScraper/
 
 1. **Tesseract Path Error**:
    - Verify Tesseract installation
-   - Update path in `newscrapper.py`
+   - Update path in `app.py`
 
 2. **ChromeDriver Issues**:
    - Ensure Chrome browser is updated
