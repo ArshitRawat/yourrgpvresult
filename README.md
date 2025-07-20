@@ -23,6 +23,22 @@ A comprehensive web application for fetching and analyzing RGPV (Rajiv Gandhi Pr
 - **Interactive Forms**: Dynamic form fields based on user selections
 - **Error Handling**: Comprehensive error messages and validation
 
+## 📸 Screenshots
+
+### Main Interface
+<img width="1349" height="639" alt="image" src="https://github.com/user-attachments/assets/a35291aa-b801-4c6a-b452-9c4a9fa8a7f3" />
+
+
+
+### SGPA Search Interface
+<img width="1366" height="638" alt="image" src="https://github.com/user-attachments/assets/f77a7af6-0f54-4579-a876-6311c5d5b29e" />
+
+
+### Results Dashboard
+<img width="1352" height="436" alt="image" src="https://github.com/user-attachments/assets/db56cef1-0fc3-4d1b-bdba-23498c22dc28" />
+
+
+
 ## 🚀 Getting Started
 
 ### Prerequisites
