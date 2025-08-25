@@ -82,18 +82,24 @@ def show_count(pct, allvals):
 def makeXslx(filename, job_id):
     csv_path = os.path.join(base_dir, f"{filename}.csv")
     excel_path = os.path.join(base_dir, f"{filename}.xlsx")
+    
+    print(f"[INFO] Creating Excel file for {filename}")
+    
     #CSV TO EXCEL
     try:
         df = pd.read_csv(csv_path, skip_blank_lines=False)
+        print(f"[INFO] CSV file loaded successfully: {len(df)} rows")
     except Exception as e:
-        print(f"Error loading CSV: {e}")
+        print(f"[ERROR] Error loading CSV: {e}")
         return None
+    
     try:
         # Reset index to start from 1 instead of 0
         df.index = df.index + 1
-        df.to_excel(excel_path, index=True) 
+        df.to_excel(excel_path, index=True)
+        print(f"[INFO] Excel file created: {excel_path}")
     except Exception as e:
-        print(f"Error saving Excel file: {e}")
+        print(f"[ERROR] Error saving Excel file: {e}")
         return None
 
     #ADDING IMAGES
@@ -104,19 +110,44 @@ def makeXslx(filename, job_id):
         img_sgpa_path = os.path.join(base_dir, f'sgpa_pie_{job_id}.png')
         img_cgpa_path = os.path.join(base_dir, f'cgpa_pie_{job_id}.png')
 
+        images_added = 0
         if os.path.exists(img_sgpa_path):
-            img_sgpa = OpenpyxlImage(img_sgpa_path)
-            ws.add_image(img_sgpa, 'K2')  #K2 IS THE CELL AT WHICH THE LEFT MOST CORNER  OF IMAGE WILL BE PUT
+            try:
+                img_sgpa = OpenpyxlImage(img_sgpa_path)
+                ws.add_image(img_sgpa, 'K2')  #K2 IS THE CELL AT WHICH THE LEFT MOST CORNER  OF IMAGE WILL BE PUT
+                images_added += 1
+                print(f"[INFO] SGPA chart added to Excel")
+            except Exception as e:
+                print(f"[WARNING] Failed to add SGPA image: {e}")
+        else:
+            print(f"[WARNING] SGPA chart image not found: {img_sgpa_path}")
+            
         if os.path.exists(img_cgpa_path):
-            img_cgpa = OpenpyxlImage(img_cgpa_path)
-            ws.add_image(img_cgpa, 'K33') #SAME AS ABOVE, BUT K33
+            try:
+                img_cgpa = OpenpyxlImage(img_cgpa_path)
+                ws.add_image(img_cgpa, 'K33') #SAME AS ABOVE, BUT K33
+                images_added += 1
+                print(f"[INFO] CGPA chart added to Excel")
+            except Exception as e:
+                print(f"[WARNING] Failed to add CGPA image: {e}")
+        else:
+            print(f"[WARNING] CGPA chart image not found: {img_cgpa_path}")
 
         wb.save(excel_path)
+        print(f"[INFO] Excel file saved with {images_added} charts")
     except Exception as e:
-        print(f"Error adding images or saving workbook: {e}")
-        return None
+        print(f"[ERROR] Error adding images or saving workbook: {e}")
+        # Don't return None here - the Excel file without images is still valid
+        if not os.path.exists(excel_path):
+            return None
 
-    return excel_path
+    # Verify the file was created successfully
+    if os.path.exists(excel_path):
+        print(f"[SUCCESS] Excel file created successfully: {excel_path}")
+        return excel_path
+    else:
+        print(f"[ERROR] Excel file was not created: {excel_path}")
+        return None
 
 
 def calculate_grades_and_averages(csv_path):
@@ -173,63 +204,105 @@ def calculate_grades_and_averages(csv_path):
 
 
 #PDF FROM EXCEL
-def makePdfFromExcel(excel_path, pdf_path,job_id):
+def makePdfFromExcel(excel_path, pdf_path, job_id):
+    try:
+        print(f"[INFO] Starting PDF generation from {excel_path}")
+        
+        # Verify Excel file exists
+        if not os.path.exists(excel_path):
+            print(f"[ERROR] Excel file does not exist: {excel_path}")
+            return False
+            
+        df = pd.read_excel(excel_path)
+        print(f"[INFO] Excel file loaded: {len(df)} rows, {len(df.columns)} columns")
+        
+        data = [df.columns.tolist()] + df.fillna('').astype(str).values.tolist()
+        print(f"[INFO] Data prepared for PDF: {len(data)} rows")
 
-    df = pd.read_excel(excel_path)
-    data = [df.columns.tolist()] + df.fillna('').astype(str).values.tolist()
+        doc = SimpleDocTemplate(
+            pdf_path,
+            pagesize=landscape(A4),
+            rightMargin=10, leftMargin=10, topMargin=15, bottomMargin=15
+        )
+        page_width = landscape(A4)[0] - 20
+        num_columns = len(data[0]) if data else 1
+        col_widths = []
+        for col_idx in range(num_columns):
+            max_content_length = 0
+            for row in data:
+                if col_idx < len(row):
+                    content_length = len(str(row[col_idx]))
+                    max_content_length = max(max_content_length, content_length)
+            content_width = max(40, min(120, max_content_length * 4.5))
+            col_widths.append(content_width)
+        total_width = sum(col_widths)
+        if total_width > page_width:
+            scale_factor = page_width / total_width
+            col_widths = [width * scale_factor for width in col_widths]
 
-    doc = SimpleDocTemplate(
-        pdf_path,
-        pagesize=landscape(A4),
-        rightMargin=10, leftMargin=10, topMargin=15, bottomMargin=15
-    )
-    page_width = landscape(A4)[0] - 20
-    num_columns = len(data[0]) if data else 1
-    col_widths = []
-    for col_idx in range(num_columns):
-        max_content_length = 0
-        for row in data:
-            if col_idx < len(row):
-                content_length = len(str(row[col_idx]))
-                max_content_length = max(max_content_length, content_length)
-        content_width = max(40, min(120, max_content_length * 4.5))
-        col_widths.append(content_width)
-    total_width = sum(col_widths)
-    if total_width > page_width:
-        scale_factor = page_width / total_width
-        col_widths = [width * scale_factor for width in col_widths]
+        table = Table(data, repeatRows=1, colWidths=col_widths)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),  
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),      # Default alignment CENTER for all cells
+            ('ALIGN', (2, 0), (2, -1), 'LEFT'),         # Override first column to LEFT
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),            
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 6),                
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 2),              
+            ('TOPPADDING', (0, 0), (-1, -1), 1),                
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 1),             
+            ('LEFTPADDING', (0, 0), (-1, -1), 1),               
+            ('RIGHTPADDING', (0, 0), (-1, -1), 1),
+            ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
+            ('WORDWRAP', (0, 0), (-1, -1), True),               
+        ]))
+        elements = [table]
+        print(f"[INFO] Table created with {num_columns} columns")
 
-    table = Table(data, repeatRows=1, colWidths=col_widths)
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),  
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),      # Default alignment CENTER for all cells
-        ('ALIGN', (2, 0), (2, -1), 'LEFT'),         # Override first column to LEFT
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),            
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 6),                
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 2),              
-        ('TOPPADDING', (0, 0), (-1, -1), 1),                
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 1),             
-        ('LEFTPADDING', (0, 0), (-1, -1), 1),               
-        ('RIGHTPADDING', (0, 0), (-1, -1), 1),              
-        ('GRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ('WORDWRAP', (0, 0), (-1, -1), True),               
-    ]))
-    elements = [table]
+        #ADDING IMAGES
+        img_sgpa_path = os.path.join(base_dir, f'sgpa_pie_{job_id}.png')
+        img_cgpa_path = os.path.join(base_dir, f'cgpa_pie_{job_id}.png')
+        
+        images_added = 0
+        if os.path.exists(img_sgpa_path):
+            try:
+                sgpa_img = PdfImage(img_sgpa_path, width=3*inch, height=3*inch)
+                elements.append(sgpa_img)
+                images_added += 1
+                print(f"[INFO] SGPA chart added to PDF")
+            except Exception as e:
+                print(f"[WARNING] Failed to add SGPA image to PDF: {e}")
+        else:
+            print(f"[WARNING] SGPA chart image not found for PDF: {img_sgpa_path}")
 
-    #ADDING IMAGES
-    img_sgpa_path = os.path.join(base_dir, f'sgpa_pie_{job_id}.png')
-    img_cgpa_path = os.path.join(base_dir, f'cgpa_pie_{job_id}.png')
-
-    if os.path.exists(img_sgpa_path):
-        sgpa_img = PdfImage(img_sgpa_path, width=3*inch, height=3*inch)
-        elements.append(sgpa_img)
-
-    if os.path.exists(img_cgpa_path):
-        cgpa_img = PdfImage(img_cgpa_path, width=3*inch, height=3*inch)
-        elements.append(cgpa_img)
-    doc.build(elements)
+        if os.path.exists(img_cgpa_path):
+            try:
+                cgpa_img = PdfImage(img_cgpa_path, width=3*inch, height=3*inch)
+                elements.append(cgpa_img)
+                images_added += 1
+                print(f"[INFO] CGPA chart added to PDF")
+            except Exception as e:
+                print(f"[WARNING] Failed to add CGPA image to PDF: {e}")
+        else:
+            print(f"[WARNING] CGPA chart image not found for PDF: {img_cgpa_path}")
+        
+        print(f"[INFO] Building PDF with {len(elements)} elements ({images_added} charts)")
+        doc.build(elements)
+        
+        # Verify PDF was created
+        if os.path.exists(pdf_path):
+            print(f"[SUCCESS] PDF created successfully: {pdf_path}")
+            return True
+        else:
+            print(f"[ERROR] PDF file was not created: {pdf_path}")
+            return False
+            
+    except Exception as e:
+        print(f"[ERROR] Error creating PDF: {e}")
+        import traceback
+        print(f"[ERROR] Traceback: {traceback.format_exc()}")
+        return False
 
 #GENERATE ENROLLMENT NUMBERS FOR REGULAR AND DIPLOMA STUDENTS
 def generate_enrollment_numbers(college, branch, year, start, end, is_diploma=False, admission_sem=None):
@@ -320,7 +393,12 @@ def fetch_sgpa_by_enrollment(enrollment_number, job_id, is_diploma=False):
         excel_path = os.path.join(base_dir, f"{target_filename}.xlsx")
         df.to_excel(excel_path, index=False)
         
-        job_files[job_id] = excel_path
+        if os.path.exists(excel_path):
+            job_files[job_id] = excel_path
+            print(f"[SUCCESS] SGPA job {job_id} file registered: {excel_path}")
+        else:
+            print(f"[ERROR] SGPA Excel file was not created for job {job_id}")
+            return False
     
     return True
 
@@ -430,8 +508,13 @@ def handle_old_result(college, branch, year, sem, start, end, job_id, is_diploma
 
             # Create the Excel file after grade calculations
             xlsx_path = makeXslx(target_filename, job_id)
-            job_files[job_id] = xlsx_path
-            return True
+            if xlsx_path and os.path.exists(xlsx_path):
+                job_files[job_id] = xlsx_path
+                print(f"[SUCCESS] Old result job {job_id} file registered: {xlsx_path}")
+                return True
+            else:
+                print(f"[ERROR] Failed to create Excel file for old result job {job_id}")
+                return False
         except Exception as e:
             print(f"[!] Error creating Excel: {e}")
             return False
@@ -460,14 +543,14 @@ def resultFound(start, end, college, branch, year, sem, job_id, is_diploma=False
     
     task_progress[job_id] = {"done": 0, "total": len(enrollments), "current_enroll": ""}
     noResult = []
-    chrome_options = Options()
+    '''chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--window-size=1920x1080")
+    chrome_options.add_argument("--window-size=1920x1080")'''
 
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Chrome()
     filename_base = f'{college}{branch}{year}sem{sem}_{job_id}'
     filename_csv = f'{filename_base}.csv'
     driver.implicitly_wait(0.5)
@@ -476,7 +559,8 @@ def resultFound(start, end, college, branch, year, sem, job_id, is_diploma=False
 
     firstRow = True
     enrollment_index = 0
-    for enroll in enrollments:
+    while enrollment_index < len(enrollments):
+        enroll = enrollments[enrollment_index]
         task_progress[job_id]["current_enroll"] = enroll
 
         try:
@@ -532,6 +616,11 @@ def resultFound(start, end, college, branch, year, sem, job_id, is_diploma=False
                     task_progress[job_id]["done"] += 1
                     enrollment_index += 1
                     noResult.append(enroll)
+                elif "wrong text" in alerttext.lower():
+                    # If wrong captcha text, clear fields and retry the same enrollment number
+                    driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_TextBox1").clear()
+                    driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_txtrollno").clear()
+                    continue  # Don't increment enrollment_index, retry same enrollment
                 else:
                     driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_TextBox1").clear()
                     driver.find_element(By.ID, "ctl00_ContentPlaceHolder1_txtrollno").clear()
@@ -631,7 +720,11 @@ def resultFound(start, end, college, branch, year, sem, job_id, is_diploma=False
     plt.close()
 
     xlsx_path = makeXslx(filename_base,job_id)
-    job_files[job_id] = xlsx_path
+    if xlsx_path and os.path.exists(xlsx_path):
+        job_files[job_id] = xlsx_path
+        print(f"[SUCCESS] Job {job_id} file registered: {xlsx_path}")
+    else:
+        print(f"[ERROR] Failed to create or register Excel file for job {job_id}")
 
 
 @app.route('/')
@@ -709,6 +802,41 @@ def get_progress(job_id):
     
     return jsonify(progress)
 
+@app.route('/status/<job_id>')
+def get_file_status(job_id):
+    """Check availability of files for a job"""
+    xlsx_path = job_files.get(job_id)
+    status = {
+        "xlsx_available": False,
+        "pdf_available": False
+    }
+    
+    if xlsx_path and os.path.exists(xlsx_path):
+        status["xlsx_available"] = True
+        
+        # Check if PDF exists or can be generated
+        base_name = os.path.splitext(xlsx_path)[0]
+        pdf_path = base_name + ".pdf"
+        
+        if os.path.exists(pdf_path):
+            status["pdf_available"] = True
+        else:
+            # Try to generate PDF to see if it's possible
+            try:
+                print(f"[INFO] Attempting to generate PDF for job {job_id}")
+                pdf_success = makePdfFromExcel(xlsx_path, pdf_path, job_id)
+                if pdf_success and os.path.exists(pdf_path):
+                    status["pdf_available"] = True
+                    print(f"[INFO] PDF successfully generated for job {job_id}")
+                else:
+                    status["pdf_available"] = False
+                    print(f"[WARNING] PDF generation failed for job {job_id}")
+            except Exception as e:
+                status["pdf_available"] = False
+                print(f"[ERROR] PDF generation error for job {job_id}: {e}")
+    
+    return jsonify(status)
+
 @app.route('/download/<job_id>')
 def download(job_id):
     file_type = request.args.get('type', 'xlsx')
@@ -729,13 +857,19 @@ def download(job_id):
     
     if file_type == 'pdf':
         if not os.path.exists(pdf_path):
-            makePdfFromExcel(xlsx_path, pdf_path,job_id)
+            # Try to create PDF, but handle failures
+            pdf_success = makePdfFromExcel(xlsx_path, pdf_path, job_id)
+            if not pdf_success or not os.path.exists(pdf_path):
+                return "PDF generation failed. Please download the Excel file instead.", 500
+        
         return send_file(
             pdf_path,
             as_attachment=True,
             download_name=os.path.basename(pdf_path),
             mimetype='application/pdf'
         )
+    
+    # Always return Excel file for xlsx requests
     return send_file(
         xlsx_path,
         as_attachment=True,
